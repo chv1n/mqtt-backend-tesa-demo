@@ -5,8 +5,10 @@ require('dotenv').config();
 const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;
 const mqttClient = mqtt.connect(MQTT_BROKER_URL);
 
+
+
 mqttClient.on('connect', () => {
-  console.log(' Connected to MQTT broker');
+  console.log(' Connected to MQTT broker', MQTT_BROKER_URL);
 
   mqttClient.subscribe('drone/status', (err) => {
     if (err) console.error(' Subscribe error:', err);
@@ -19,7 +21,6 @@ mqttClient.on('message', async (topic, message) => {
 
   try {
     const data = JSON.parse(message.toString());
-
     const drone = new Drone({
       isDrone: data.isDrone,
       time: data.time,
