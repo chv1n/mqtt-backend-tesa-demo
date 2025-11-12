@@ -2,11 +2,10 @@ const express = require("express");
 const http = require("http");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-const mqttClient = require("./config/mqtt");
 const { initSocket } = require("./config/socket");
-const routes = require("./routes");
-const drone = require("./routes/drone");
-const mqttHandler = require("./config/mqttHandler");
+const droneRoutes = require("./routes/drone");
+const indexRoutes = require("./routes/index");
+const { swaggerUi, specs } = require("./swagger"); // ✅ เพิ่มบรรทัดนี้
 
 dotenv.config();
 connectDB();
@@ -14,15 +13,15 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ เริ่ม socket.io แยกไฟล์
-const io = initSocket(server);
+// ✅ Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
+// ✅ Routes
+app.use("/api", indexRoutes);
+app.use("/api/drones", droneRoutes);
 
-
-mqttHandler(mqttClient, io);
-
-app.use("/api", routes);
-app.use("/drone", drone);
+// ✅ Socket
+initSocket(server);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
