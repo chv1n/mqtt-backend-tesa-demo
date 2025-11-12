@@ -18,7 +18,7 @@ require('dotenv').config({path: '../../.env' });
 console.log('Loaded .env:', process.env.MQTT_BROKER_URL);
 
 
-const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;
+const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || "mqtt://broker.emqx.io:1883";
 console.log('🚀 Simulator starting...');
 const mqttClient = mqtt.connect(MQTT_BROKER_URL);
 

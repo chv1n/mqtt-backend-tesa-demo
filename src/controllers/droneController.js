@@ -1,4 +1,4 @@
-const Drone = require('../model/drone');
+const Drone = require('../models/Drone');
 
 exports.getAllDrones = async (req, res) => {
   try {

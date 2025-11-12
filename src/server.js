@@ -1,58 +1,28 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const connectDB = require('./config/db');
-const mqttClient = require('./config/mqtt');
-const routes = require('./routes');
-const drone = require('./routes/drone');
-require('dotenv').config();
+const express = require("express");
+const http = require("http");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const mqttClient = require("./config/mqtt");
+const { initSocket } = require("./config/socket");
+const routes = require("./routes");
+const drone = require("./routes/drone");
+const mqttHandler = require("./config/mqttHandler");
 
-const app = express();
+dotenv.config();
 connectDB();
 
-// สร้าง HTTP server + socket.io
+const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*", // หรือระบุ "http://localhost:5173"
-    methods: ["GET", "POST"]
-  }
-});
 
-// เมื่อมี client เชื่อมต่อ
-io.on('connection', (socket) => {
-  console.log('[WS] Client connected:', socket.id);
-  socket.on('disconnect', () => console.log('[WS] Client disconnected:', socket.id));
-});
+// ✅ เริ่ม socket.io แยกไฟล์
+const io = initSocket(server);
 
-// ---- MQTT → Socket.io ----
-mqttClient.on('connect', () => {
-  console.log('[MQTT] Connected to broker');
-  mqttClient.subscribe('tesa/drone_data', (err) => {
-    if (err) console.error('[MQTT] Subscribe error:', err);
-    else console.log('[MQTT] Subscribed to tesa/drone_data');
-  });
-});
 
-mqttClient.on('message', (topic, message) => {
-  try {
-    const data = JSON.parse(message.toString());
 
-    // ✅ ส่งข้อมูลแบบ realtime ไปยัง WS
-    io.emit('drone_update', data);
+mqttHandler(mqttClient, io);
 
-    console.log(`📡 MQTT → WS:`, data);
-  } catch (err) {
-    console.error('[MQTT] Error parsing message:', err.message);
-  }
-});
+app.use("/api", routes);
+app.use("/drone", drone);
 
-// routes หลัก
-app.use('/', routes);
-app.use('/api/drones', drone);
-
-// เริ่มเซิร์ฟเวอร์
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`🚀 HTTP + WS Server running on port ${port}`);
-});
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -1,0 +1,44 @@
+{
+    "time": 1762941241,
+    "side": "def",
+    "cam_info": [
+        {
+            "cam_id": "cam001",
+            "cam_lat": 14.295562738179186,
+            "cam_lon": 101.16908778997438,
+            "cam_bat": 99
+        }
+    ],
+    "object": [
+        {
+            "frame": 189,
+            "id": 0,
+            "type": "AutelEvo",
+            "lat": 14.29268,
+            "lon": 101.18807,
+            "velocity": 8.26,
+            "direction": 135.8,
+            "imgbase64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+        },
+        {
+            "frame": 118,
+            "id": 1,
+            "type": "DJIAir",
+            "lat": 14.31514,
+            "lon": 101.1633,
+            "velocity": 8.59,
+            "direction": 313.3,
+            "imgbase64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+        },
+        {
+            "frame": 116,
+            "id": 2,
+            "type": "AutelEvo",
+            "lat": 14.31131,
+            "lon": 101.16633,
+            "velocity": 6.2,
+            "direction": 332.3,
+            "imgbase64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+        }
+    ]
+}
