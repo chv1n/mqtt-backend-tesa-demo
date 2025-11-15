@@ -1,7 +1,6 @@
 const Drone = require("../models/Drone");
 const DroneLog = require("../models/DroneLog");
 
-// 🟢 GET /api/drones?filter/sort/pagination (เดิม)
 exports.getAllDrones = async (req, res) => {
   try {
     const { type, side, sort = "first_seen", order = "desc", page = 1, limit = 10 } = req.query;
@@ -20,6 +19,8 @@ exports.getAllDrones = async (req, res) => {
 
     const total = await Drone.countDocuments(query);
 
+    console.log('drones', drones)
+
     res.json({
       total,
       page: parseInt(page),
@@ -32,7 +33,6 @@ exports.getAllDrones = async (req, res) => {
   }
 };
 
-// 🟢 GET /api/drones/:id  (ใช้ MongoDB _id)
 exports.getDroneById = async (req, res) => {
   try {
     const drone = await Drone.findById(req.params.id);
@@ -44,7 +44,6 @@ exports.getDroneById = async (req, res) => {
   }
 };
 
-// 🟡 GET /api/drones/:id/logs  (ดึง log ด้วย drone_id)
 exports.getDroneLogs = async (req, res) => {
   try {
     const drone = await Drone.findById(req.params.id);
@@ -53,13 +52,55 @@ exports.getDroneLogs = async (req, res) => {
     const { sort = "timestamp", order = "desc", limit = 100 } = req.query;
     const sortOrder = order === "asc" ? 1 : -1;
 
-    const logs = await DroneLog.find({ drone_id: drone.drone_id })
+    const logs = await DroneLog.find({ drone_id: drone.drone_id, cam_id: drone.first_cam_id, })
       .sort({ [sort]: sortOrder })
       .limit(parseInt(limit));
 
     res.json({ drone_id: drone.drone_id, total: logs.length, data: logs });
   } catch (err) {
     console.error("❌ Error fetching drone logs:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.getOffSideLogs = async (req, res) => {
+  try {
+    const { 
+      from, 
+      to, 
+      page = 1, 
+      limit = 20, 
+      sort = "timestamp", 
+      order = "desc" 
+    } = req.query;
+
+    const query = { side: "off" };
+
+    if (from || to) {
+      query.timestamp = {};
+      if (from) query.timestamp.$gte = new Date(from);
+      if (to) query.timestamp.$lte = new Date(to);
+    }
+
+    const sortOrder = order === "asc" ? 1 : -1;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const logs = await DroneLog.find(query)
+      .sort({ [sort]: sortOrder })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await DroneLog.countDocuments(query);
+
+    res.json({
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      data: logs,
+    });
+
+  } catch (err) {
+    console.error("❌ Error fetching off-side logs:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 };

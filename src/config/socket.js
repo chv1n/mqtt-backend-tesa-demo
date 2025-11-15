@@ -1,3 +1,8 @@
+/**
+ * socket.js — Drone Telemetry & Live Stream Socket.IO Handler
+ * Author: CON Fusez
+ */
+
 const { Server } = require("socket.io");
 const Drone = require("../models/Drone");
 const DroneLog = require("../models/DroneLog");
@@ -18,30 +23,29 @@ function initSocket(server) {
         const { cam_info, object, side, time } = data;
         const camId = cam_info?.[0]?.cam_id;
         const timestamp = new Date(time * 1000);
+        console.log("data in from pi", data)
 
         for (const d of object) {
-          // 🔹 ตรวจว่ามี drone_id นี้อยู่แล้วหรือยัง
           const existing = await Drone.findOne({ drone_id: d.id });
 
           if (!existing) {
-            console.log(d.imgbase64)
-            // 🆕 ครั้งแรก: เก็บข้อมูลพร้อมรูป base64
-            const rs = await Drone.create({
+            await Drone.create({
               drone_id: d.id,
               type: d.type,
               side,
               first_seen: timestamp,
               first_cam_id: camId,
-              image_path: d.imgbase64, // เก็บครั้งแรกเท่านั้น
+              image_path: d.imgbase64,
             });
-            console.log(`🆕 New drone detected: ID=${d.id}, saved to DB`, rs);
+            console.log(`🆕 New drone detected: ID=${d.id}`);
           }
 
-          // 🟣 เก็บ log ทุกครั้ง
           await DroneLog.create({
-            drone_id: d.id,
             timestamp,
+            drone_id: d.id,
+            side: "def",
             cam_id: camId,
+            drone_type: d.type,
             lat: d.lat,
             lon: d.lon,
             velocity: d.velocity,
@@ -49,9 +53,26 @@ function initSocket(server) {
           });
         }
 
-        io.emit("drone_update", data); // ส่งต่อให้ frontend
+        io.emit("drone_update", data);
       } catch (err) {
         console.error("❌ Error handling telemetry:", err.message);
+      }
+    });
+
+    socket.on("pi_stream", (frame) => {
+      try {
+        const { cam_id, drone_id, time, imgbase64 } = frame;
+
+        io.emit("drone_frame", {
+          cam_id,
+          drone_id,
+          time,
+          imgbase64,
+        });
+
+        console.log(`[STREAM] ${cam_id} -> Drone ${drone_id} (${new Date(time * 1000).toISOString()})`);
+      } catch (err) {
+        console.error("❌ Error handling pi_stream:", err.message);
       }
     });
 
