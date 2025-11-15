@@ -103,7 +103,9 @@ const router = express.Router();
 const droneController = require("../controllers/droneController");
 
 router.get("/", droneController.getAllDrones);
+router.get("/logs/off", droneController.getOffSideLogs);
 router.get("/:id", droneController.getDroneById);
 router.get("/:id/logs", droneController.getDroneLogs);
+
 
 module.exports = router;

@@ -1,4 +1,3 @@
-// models/Drone.js
 const mongoose = require("mongoose");
 
 const droneSchema = new mongoose.Schema({
