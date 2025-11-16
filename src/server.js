@@ -7,8 +7,6 @@ const { initSocket } = require("./config/socket");
 const droneRoutes = require("./routes/drone");
 const indexRoutes = require("./routes/index");
 const { swaggerUi, specs } = require("./swagger");
-
-// ✅ เพิ่มสองไฟล์นี้เข้ามา
 const mqttClient = require("./config/mqtt");
 const mqttHandler = require("./config/mqttHandler");
 
@@ -24,17 +22,17 @@ app.use(cors({
 
 const server = http.createServer(app);
 
-// ✅ Swagger UI
+// Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-// ✅ Routes
+// Routes
 app.use("/api", indexRoutes);
 app.use("/api/drones", droneRoutes);
 
-// ✅ Socket.IO
+// Socket.IO
 const io = initSocket(server);
 
-// ✅ MQTT → Socket.IO (จุดเชื่อมหลัก)
+// MQTT → Socket.IO (จุดเชื่อมหลัก)
 mqttHandler(mqttClient, io);
 
 const PORT = process.env.PORT || 3000;
