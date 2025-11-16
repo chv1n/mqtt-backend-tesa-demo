@@ -1,7 +1,3 @@
-/**
- * socket.js — Drone Telemetry & Live Stream Socket.IO Handler
- * Author: CON Fusez
- */
 
 const { Server } = require("socket.io");
 const Drone = require("../models/Drone");

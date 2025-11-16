@@ -5,7 +5,7 @@ const droneSchema = new mongoose.Schema({
   type: String,
   first_seen: Date,
   first_cam_id: String,
-  image_path: String, // 📸 เก็บ path ของไฟล์ภาพ
+  image_path: String,
   side: String,
 });
 

@@ -10,8 +10,7 @@ module.exports = (mqttClient, io) => {
 
       const { timestamp, side, lat, lon, alt } = data;
       const ts = new Date(timestamp * 1000);
-      const drone_id = 999; // ตัวอย่าง ถ้า Pi ไม่มี id — ใช้ค่า default หรือ hash ก็ได้
-      const drone_type = "MQTT-Drone";
+      const drone_id = 999; 
 
       io.emit("drone_update", data);
 
