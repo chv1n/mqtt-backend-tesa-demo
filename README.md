@@ -1,3 +1,8 @@
+## 🏆 **19th TESA Top Gun Rally - Defense Innovation**
+
+**โปรเจกต์แข่งขันจาก TESA (Thai Embedded Systems Association)**  
+**ร่วมกับ โรงเรียนนายร้อยพระจุลจอมเกล้า (CRMA)**
+
 # 🚁 Drone Tracking API
 
 > **Backend สำหรับระบบติดตามโดรน (Drone Tracking System)**  
