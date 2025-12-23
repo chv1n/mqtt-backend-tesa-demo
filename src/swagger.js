@@ -1,4 +1,3 @@
-// swagger.js
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const dotenv = require("dotenv");
@@ -20,7 +19,6 @@ const options = {
     ],
   },
   apis: ["./src/routes/*.js"],
-  // 👈 ให้ Swagger ไปอ่าน doc จาก comment ใน routes
 };
 
 const specs = swaggerJsdoc(options);
